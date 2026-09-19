@@ -29,6 +29,8 @@
     fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(new FormData(form)) })
       .then(function () {
         btn.disabled = false;
+        // 애널리틱스에 「문의 1건」만 알린다 — 성함·연락처 같은 개인정보는 보내지 않는다
+        if (window.gtag) gtag('event', 'generate_lead', { business_type: form.elements.business.value || '미선택' });
         form.reset();
         msg.hidden = false;
         msg.textContent = '보내 주셔서 감사합니다. 이틀 안에 연락드리겠습니다.';
