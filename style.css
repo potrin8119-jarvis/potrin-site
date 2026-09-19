@@ -58,7 +58,8 @@ main :focus-visible { outline-color: var(--navy); }
 /* 상단 */
 .top { position: sticky; top: 0; z-index: 10; background: rgba(12, 40, 66, .96); backdrop-filter: blur(6px); }
 .top-in { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-.logo { color: var(--punch); font-weight: 800; letter-spacing: .12em; font-size: 20px; }
+.logo { display: flex; align-items: center; }
+.logo img { height: 40px; width: auto; }
 nav { display: flex; gap: 28px; align-items: center; }
 nav a { color: #C9D6E4; font-size: 15px; font-weight: 600; transition: color .2s ease; }
 nav a:hover { color: #fffdf7; }
@@ -174,6 +175,7 @@ input:user-invalid, select:user-invalid, textarea:user-invalid { border-color: v
 /* 바닥 */
 footer { background: var(--navy); color: #A9BCD0; padding: 56px 0; font-size: 14px; }
 .foot-in { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+.foot-brand img { height: 30px; width: auto; margin-bottom: 14px; }
 .sig { color: var(--punch); font-size: 20px; font-weight: 800; }
 .foot-meta { display: flex; gap: 18px; flex-wrap: wrap; }
 
