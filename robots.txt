@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://potrin.net/sitemap.xml

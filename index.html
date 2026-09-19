@@ -10,7 +10,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://potrin.net/">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<link rel="stylesheet" href="style.css?v=20260919b">
+<link rel="stylesheet" href="style.css?v=20260919c">
 </head>
 <body>
 
@@ -93,12 +93,28 @@
   <!-- 5. 브랜드 -->
   <section class="brands" id="brands">
     <div class="wrap">
-      <p class="label">함께 만든 브랜드</p>
-      <h2>직접 기획하고, 들여오고,<br>운영하는 브랜드입니다.</h2>
+      <p class="label">함께하는 브랜드</p>
+      <h2>직접 들여오고,<br>운영하는 브랜드입니다.</h2>
       <div class="brand-grid">
-        <div class="brand soon"><b>브랜드 공개 준비 중</b><span>확인이 끝나는 대로 하나씩 채웁니다</span></div>
-        <div class="brand soon"><b>브랜드 공개 준비 중</b><span>확인이 끝나는 대로 하나씩 채웁니다</span></div>
-        <div class="brand soon"><b>브랜드 공개 준비 중</b><span>확인이 끝나는 대로 하나씩 채웁니다</span></div>
+        <a class="brand" href="https://brand.naver.com/cellair" target="_blank" rel="noopener">
+          <img src="img/brand-a.png" alt="셀레어 Cellair" width="667" height="160">
+          <p>에어로 완성하는 편안함.<br>넥필로우·쿠션</p>
+          <span class="role">소싱 · 운영</span>
+          <span class="go">스토어 보기 →</span>
+        </a>
+        <a class="brand" href="https://smartstore.naver.com/omix" target="_blank" rel="noopener">
+          <img src="img/brand-b.png" alt="오믹스 OMIX" width="610" height="160">
+          <p>업무공간을 더 편안하게.<br>데스크 가전</p>
+          <span class="role">소싱 · 운영</span>
+          <span class="go">스토어 보기 →</span>
+        </a>
+        <!-- 세 번째 브랜드는 검색에 잡히지 않게 한다(사장님 지시 2026-09-19): 이름을 글자로 쓰지 않고 로고 이미지로만, alt 도 비운다 -->
+        <a class="brand" href="https://naver.me/FG3Jr5BW" target="_blank" rel="noopener nofollow">
+          <img src="img/brand-c.png" alt="" width="1133" height="160">
+          <p>홈 뷰티·헬스케어<br>디바이스</p>
+          <span class="role">오프라인 총판</span>
+          <span class="go">스토어 보기 →</span>
+        </a>
       </div>
     </div>
   </section>
@@ -146,7 +162,7 @@
         <input type="hidden" name="utm_source">
         <input type="hidden" name="utm_medium">
         <input type="hidden" name="utm_campaign">
-        <label class="agree"><input type="checkbox" name="agree" required> 문의 답변을 위한 개인정보(성함·연락처·이메일) 수집·이용에 동의합니다. 답변 후 1년간 보관 후 파기합니다.</label>
+        <label class="agree"><input type="checkbox" name="agree" required> 문의 답변을 위한 개인정보(성함·연락처·이메일) 수집·이용에 동의합니다. 답변 후 1년간 보관 후 파기합니다. <a href="privacy.html" target="_blank">개인정보처리방침</a></label>
         <button class="btn" type="submit">문의 보내기</button>
         <p class="form-msg" id="formMsg" hidden></p>
       </form>
@@ -158,11 +174,11 @@
 <footer>
   <div class="wrap">
     <p class="sig">소싱은 견적이 아니라 설계입니다.</p>
-    <p>(주)포트린 · 대표 이철규</p>
+    <p>(주)포트린 · 대표 이철규 · <a href="privacy.html">개인정보처리방침</a></p>
     <p>© POTRIN</p>
   </div>
 </footer>
 
-<script src="main.js?v=20260919b"></script>
+<script src="main.js?v=20260919c"></script>
 </body>
 </html>
