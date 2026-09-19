@@ -94,6 +94,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--navy); bord
 .agree { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; font-size: 14px; color: var(--gray); }
 .agree input { margin-top: 5px; width: 18px; height: 18px; flex: none; }
 .contact .btn { background: var(--navy); color: var(--punch); justify-self: start; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .form-msg { font-weight: 700; color: var(--navy); }
 
 /* 바닥 */

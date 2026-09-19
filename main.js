@@ -7,8 +7,8 @@
     if (v) { sessionStorage.setItem(k, v); form.elements[k].value = v; }
   });
 
-  // 문의를 받을 주소(구글 시트 연결)는 아직 없다 — 시안 단계에서는 보내지 않고 안내만 한다
-  const ENDPOINT = '';
+  // 문의는 구글 앱스 스크립트 웹 앱(「potrin.net 문의 폼」)이 받아 「potrin.net 문의함」 시트에 쌓고 메일로 알린다
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwXNIfXQgS3xAs-zdojAqDPqjii4X35rn30T5cnvk7U8VCmYvQqPG5ZCCUTr7rkYnby8g/exec';
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -23,13 +23,18 @@
       msg.textContent = '시안입니다 — 아직 문의가 전송되지 않습니다.';
       return;
     }
-    fetch(ENDPOINT, { method: 'POST', body: new FormData(form) })
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true;
+    // 앱스 스크립트는 다른 주소라 응답을 읽을 수 없다(no-cors) — 보내기만 하고 실패는 네트워크 오류로만 판단한다
+    fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(new FormData(form)) })
       .then(function () {
+        btn.disabled = false;
         form.reset();
         msg.hidden = false;
         msg.textContent = '보내 주셔서 감사합니다. 이틀 안에 연락드리겠습니다.';
       })
       .catch(function () {
+        btn.disabled = false;
         msg.hidden = false;
         msg.textContent = '전송에 실패했습니다. 잠시 뒤 다시 보내 주세요.';
       });
