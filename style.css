@@ -198,3 +198,21 @@ footer { background: var(--surface); color: var(--muted); padding: 56px 0; font-
   .contact .btn-primary { justify-self: stretch; }
   .foot-in { flex-direction: column; align-items: flex-start; }
 }
+
+/* 게임 구획 - 남색 바탕 한 칸, 오른쪽에 항해 그림 */
+.game { background: var(--surface); }
+.game .eyebrow { color: var(--muted); }
+.game-in { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 56px; align-items: center; }
+.game h2 em { font-style: normal; color: var(--navy); display: block; font-size: .62em; margin-top: 10px; }
+.game-copy > p { color: var(--muted); font-size: 19px; margin-top: 20px; max-width: 32em; }
+.game-copy .game-prize { color: var(--ink); font-weight: 700; }
+.game-copy .game-prize b { color: var(--navy); }
+.game-copy .btn { margin-top: 32px; }
+.game .btn-primary { background: var(--navy); color: var(--punch); }
+@media (prefers-color-scheme: dark) { .game h2 em, .game-copy .game-prize b { color: var(--punch); } .game .btn-primary { background: var(--punch); color: var(--navy); } }
+.game-visual { aspect-ratio: 1; border-radius: 20px; background: radial-gradient(ellipse at 50% 40%, #1d5285, #0B2440 75%); display: grid; place-items: center; align-content: center; gap: 10px; }
+.game-visual span { font-size: 96px; }
+.game-visual small { color: var(--punch); font-weight: 800; font-size: 15px; background: rgb(11 36 64 / .7); padding: 6px 14px; border-radius: 999px; }
+@media (prefers-reduced-motion: no-preference) { .game-visual span { animation: bob 2.6s ease-in-out infinite; } }
+@keyframes bob { 50% { transform: translateY(-8px) rotate(-3deg); } }
+@media (max-width: 767px) { .game-in { grid-template-columns: 1fr; gap: 32px; } .game-visual { aspect-ratio: 16 / 9; } .game-copy .btn { width: 100%; } }
