@@ -101,6 +101,9 @@ button{font:inherit;cursor:pointer;border:0}
 .claim .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .title .foot{margin-top:18px;font-size:12.5px;color:#8FA6BF;line-height:1.6}
 .title .foot a{color:var(--punch)}
+.bnote{position:fixed;left:50%;top:100px;transform:translate(-50%,-8px);z-index:16;background:var(--navy);color:var(--punch);border:1px solid rgb(245 238 205 / .3);border-radius:16px;padding:12px 16px;width:max-content;max-width:min(92vw,440px);font-size:14px;line-height:1.55;box-shadow:0 10px 30px rgb(0 0 0 / .35);opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+.bnote.on{opacity:1;transform:translate(-50%,0)}
+.bnote b{color:#fff}.bnote .up{color:var(--gold);font-weight:900}
 .toast{position:fixed;left:50%;top:58px;transform:translateX(-50%);z-index:15;background:var(--ink);color:#fff;font-weight:800;font-size:14px;padding:9px 16px;border-radius:999px;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(4px)}
 .sailing{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;background:rgb(11 36 64 / .9);color:var(--punch);border-radius:999px;padding:12px 20px;font-weight:800;font-size:15px;border:1px solid rgb(245 238 205 / .25);white-space:nowrap}
@@ -130,6 +133,7 @@ button{font:inherit;cursor:pointer;border:0}
 <div class="sheet" id="sheet" hidden></div>
 <div class="sailing" id="sailing" hidden></div>
 <div class="toast" id="toast"></div>
+<div class="bnote" id="bnote" role="status"></div>
 <div class="modal" id="modal" hidden><div class="card" id="mcard"></div></div>
 
 <div class="title" id="title">
@@ -209,6 +213,7 @@ const REAL = {
   canton:['🎪','캔톤페어 개막!','4월과 10월, 광저우에 세계 바이어가 모입니다. 공장들이 박람회 특가를 냅니다.','박람회는 <b>공장을 직접 고르는</b> 가장 빠른 길입니다. 사진만 보고 고르지 않습니다.'],
   export:['🌏','첫 수출!','한국 제품을 찾는 바이어는 세계에 있습니다. 소싱은 들여오는 것만이 아닙니다.','매장·브랜드가 있다면 <b>그 제품으로 수출</b>할 수도 있습니다.'],
   fx:['💱','환율이 움직입니다','원화가 약해지면 같은 공장가도 비싸집니다. 오른쪽 위 💱 숫자를 보세요.','결제 시점을 나눠 <b>환율 위험을 쪼갭니다</b>. 한 번에 다 내지 않습니다.'],
+  brand:['🏷️','브랜드 가치가 생겼습니다','창고에서 온라인으로 팔린 이익이 쌓이면 그게 브랜드 가치가 됩니다. 수출·도매는 그날 번 돈으로 끝나지만, 꾸준히 팔리는 브랜드는 그 자체로 값이 붙습니다.','사는 쪽은 <b>매출이 아니라 꾸준한 이익</b>을 봅니다. 재고가 끊기지 않게 굴리는 것이 브랜드 가치를 키우는 가장 빠른 길입니다.'],
   exit:['🚀','브랜드는 팔 수 있는 자산입니다','물건을 사고파는 장사는 그날 번 돈이 전부입니다. 하지만 꾸준히 이익을 내는 온라인 브랜드는 그 자체를 팔 수 있습니다.','이커머스 브랜드는 보통 <b>연 이익의 2~4배</b>에 사고팝니다. 숫자로 증명되는 브랜드만 팔립니다. 그래서 처음부터 매출이 아니라 이익을 남기는 구조로 짭니다.'],
   ops:['🧑‍💼','운영 대행 계약','상세페이지·광고·CS를 맡기면 창고 재고가 더 빨리 팔립니다. 대신 매달 비용이 나갑니다.','배를 몰 시간에 스토어까지 보면 둘 다 놓칩니다. <b>사람을 뽑기 전에 맡겨 보는 것</b>도 방법입니다.']
 };
@@ -383,7 +388,7 @@ function tick(){
   });
   const fee=Math.round(boxesHeld)*120; G.cash-=fee;
   G.brand.hist.push(bp-fee); if(G.brand.hist.length>TRACK) G.brand.hist.shift();
-  monthly(); checkDeal(); maybeOffer(); if(G.day%10===0) save();
+  monthly(); checkDeal(); maybeOffer(); brandWatch(); if(G.day%10===0) save();
   if(fee>0 && !G.seen.storage && G.day>20){ G.seen.storage=1; real('storage'); }
   if(G.day%90===0 && G.vat>0){ toast(`🧾 부가세 환급 +${fmt(G.vat)}`); G.cash+=G.vat; G.vat=0; }
   if(G.ops && G.day%30===0){ G.cash-=990000; }
@@ -396,6 +401,28 @@ function tick(){
 const TRACK = 120; // 실적 기간 — 넉 달은 꾸준히 팔아야 사러 온다 (10/9 사장님 「살짝 어렵게」)
 function brandProfit(){ const h=G.brand.hist; if(!h.length) return 0; return h.reduce((a,b)=>a+b,0)/TRACK*365*.6; }
 function brandValue(){ return Math.max(0, Math.round(brandProfit()*3)); }
+// 브랜드 가치가 단계를 넘을 때마다 안내 — 항해를 멈추지 않는 띠로 띄운다 (2026-10-10 사장님 「브랜드 가치가 올라갈 때마다 안내 메시지」)
+const BV_STEPS=[5e6,1e7,2e7,3e7,5e7,7e7,1e8,1.5e8,2e8,3e8,5e8];
+let bnoteT;
+function brandNote(html){ const el=$('bnote'); el.innerHTML=html; el.classList.add('on'); clearTimeout(bnoteT); bnoteT=setTimeout(()=>el.classList.remove('on'),5000); }
+function brandWatch(){
+  const b=G.brand; if(b.exited) return;
+  const v=brandValue(), ap=brandProfit(); let k=(b.step==null?-1:b.step); const out=[];
+  while(k+1<BV_STEPS.length && v>=BV_STEPS[k+1]) k++;
+  if(k>(b.step==null?-1:b.step)){
+    b.step=k;
+    const hint = b.deal ? '🔍 실사 중 — 이 흐름만 지키면 제값에 팝니다'
+      : b.hist.length<TRACK ? `매각 제안까지 · 실적 <b>${b.hist.length}/${TRACK}일</b> · 연 이익 <b>${fmt(ap)}</b>/2,500만`
+      : ap<25e6 ? `매각 제안까지 · 연 이익 <b>${fmt(ap)}</b>/2,500만 — 조금만 더`
+      : b.ready ? '🤝 언제든 브랜드를 사겠다는 연락이 올 수 있어요' : '';
+    out.push(`🏷️ 브랜드 가치 <span class="up">${fmt(BV_STEPS[k])}</span> 돌파! 지금 <b>${fmt(v)}</b>${hint?'<br>'+hint:''}`);
+    if(window.gtag) gtag('event','brand_value_step',{game:'voyage', step:BV_STEPS[k]});
+    if(!G.seen.brand){ G.seen.brand=1; real('brand'); }
+  }
+  if(!b.ready && !b.deal && b.hist.length>=TRACK && ap>=25e6){ b.ready=1;
+    out.push(`🤝 <b>매각 제안을 받을 자격이 생겼습니다</b><br>실적 넉 달 + 연 이익 ${fmt(ap)}. 사겠다는 곳이 곧 찾아올 수 있어요`); }
+  if(out.length) brandNote(out.join('<hr style="border:0;border-top:1px solid rgb(245 238 205 / .25);margin:8px 0">'));
+}
 const BUYERS=['생활용품 브랜드를 모으는 투자사','대형 유통사 PB팀','해외 진출을 노리는 중견기업','홈쇼핑 벤더','같은 업종 경쟁 브랜드'];
 function maybeOffer(){
   const b=G.brand; if(b.exited||b.deal) return;
