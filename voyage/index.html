@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="color-scheme" content="light">
 <title>소싱 항해 | 포트린</title>
-<!-- 2026-10-09 홈페이지 공개(사장님 「포트린 홈페이지에 게임 넣자」). 원본은 _시안/voyage, 여기는 배포본. 사장님 「대항해시대처럼 세계를 돌아다니며 소싱해서 한국에서 팔고 수출하는 게임」.
+<!-- 2026-10-09 첫 판(v0.1). 사장님 「대항해시대처럼 세계를 돌아다니며 소싱해서 한국에서 팔고 수출하는 게임」.
      게임 속 MOQ·관세·부가세·KC·검품·환율·보관비는 실제 규칙을 줄여 넣었다. 숫자는 게임용 — 실거래가 아니다 -->
 <meta name="description" content="세계 공장을 돌며 제품을 들여와 한국에서 팔고, 한국 제품을 세계에 수출하세요. 1년 안에 브랜드를 키워 파는 브라우저 게임.">
 <meta property="og:title" content="소싱 항해 — 1년 안에 1억을 만들 수 있을까?">
@@ -42,6 +42,7 @@ button{font:inherit;cursor:pointer;border:0}
 @media(min-width:900px){.sheet{left:auto;right:16px;bottom:16px;top:64px;width:420px;max-height:none;border-radius:22px}}
 .sheet .handle{display:block;width:100%;background:none;padding:0 0 8px;color:var(--muted);font-size:12px;font-weight:800}
 .sheet.min{max-height:none}.sheet.min>*:not(h2):not(.handle){display:none}
+@media(min-width:900px){.sheet.min{top:auto}}
 @media(max-width:899px){.sheet{max-height:50vh}}
 .sheet h2{font-size:22px;font-weight:900;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
 .sheet .flavor{color:var(--muted);font-size:14px;margin-top:4px}
@@ -68,6 +69,11 @@ button{font:inherit;cursor:pointer;border:0}
 .qc{font-size:12.5px;color:var(--muted);display:flex;gap:5px;align-items:center}
 .note{font-size:13px;color:var(--muted);background:var(--cream);border-radius:12px;padding:10px 12px;margin-top:10px;line-height:1.5}
 .note b{color:var(--navy)}
+.store{background:var(--navy);color:var(--punch);border-radius:16px;padding:14px;margin-bottom:10px}
+.st-h{display:flex;justify-content:space-between;align-items:center;font-size:14px}.st-h b{color:#fff;font-size:15px}
+.st-n{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.st-n small{display:block;font-size:11px;color:#8FA6BF}.st-n b{color:#fff;font-size:16px}
+.st-bars{display:flex;align-items:flex-end;gap:3px;height:38px;margin-top:10px}.st-bars i{flex:1;background:var(--gold);border-radius:3px 3px 0 0;min-height:2px}.st-bars span{font-size:12px;color:#8FA6BF}
+.st-f{font-size:11.5px;color:#C9D6E4;margin-top:8px;line-height:1.5}.st-f b{color:#fff}
 .bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:6px}
 .bar i{display:block;height:100%;background:var(--green)}
 /* 가운데 알림 */
@@ -106,7 +112,8 @@ button{font:inherit;cursor:pointer;border:0}
 .bnote b{color:#fff}.bnote .up{color:var(--gold);font-weight:900}
 .toast{position:fixed;left:50%;top:58px;transform:translateX(-50%);z-index:15;background:var(--ink);color:#fff;font-weight:800;font-size:14px;padding:9px 16px;border-radius:999px;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(4px)}
-.sailing{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;background:rgb(11 36 64 / .9);color:var(--punch);border-radius:999px;padding:12px 20px;font-weight:800;font-size:15px;border:1px solid rgb(245 238 205 / .25);white-space:nowrap}
+.sailing small{font-size:12.5px;color:#C9D6E4;font-weight:700}
+.sailing{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;background:rgb(11 36 64 / .9);color:var(--punch);border-radius:999px;padding:12px 20px;font-weight:800;font-size:15px;border:1px solid rgb(245 238 205 / .25);white-space:nowrap;text-align:center;line-height:1.45}
 .end .score{font-size:46px;font-weight:900;color:var(--navy);letter-spacing:-.03em}
 .end .ttl{display:inline-block;background:var(--navy);color:var(--punch);font-weight:900;padding:6px 14px;border-radius:999px;margin-top:6px}
 .end table{width:100%;margin-top:14px;font-size:14px;border-collapse:collapse}
@@ -123,6 +130,7 @@ button{font:inherit;cursor:pointer;border:0}
   <span class="chip">🏷️ 브랜드 <b id="hBrand"></b></span>
   <span class="chip">📅 <b id="hDate"></b></span>
   <span class="chip">📦 <b id="hCargo"></b></span>
+  <span class="chip">🛒 <b id="hOrders"></b></span>
   <span class="chip">⭐ 신용 <b id="hCredit"></b></span>
   <span class="chip">💱 <b id="hFx"></b></span>
   <span class="grow"></span>
@@ -200,7 +208,8 @@ const GOODS = {
   ginseng:{n:'홍삼 스틱', e:'🌿', per:40, moq:1, buy:{ICN:15000}, ex:{DXB:42000, TPE:33000, LAX:38000, SGN:30000}, size:500, export:true},
   ramen:{n:'K-라면', e:'🍜', per:40, moq:1, buy:{ICN:900}, ex:{DXB:2400, LAX:2600, SGN:2000, BKK:2100}, size:9000, export:true}
 };
-const SHIPS = [{n:'소형 합적(LCL)', cap:30, cost:0},{n:'20피트 컨테이너', cap:80, cost:15000000},{n:'40피트 컨테이너', cap:180, cost:50000000},{n:'전용 화물선', cap:400, cost:150000000}];
+// 배는 내 것이 아니다 — 포워더(운송 대행)에 실은 박스만큼 운임을 낸다 (2026-10-11 사장님 「나는 선사도 아니고 배를 갖고 있지도 않아」)
+const FREIGHT_PER_BOX_DEG = 800, DOC_FEE = 200000;
 const CLIENTS_IN = {tumbler:'카페 프랜차이즈 본사', speaker:'기업 판촉물 담당', yoga:'요가 스튜디오 커뮤니티', pet:'반려동물 매장 체인', chair:'캠핑장 운영사', linen:'동네 편집숍', coffee:'카페 프랜차이즈 본사', keyring:'캐릭터 팝업스토어', stationery:'학원 프랜차이즈 본사', sensor:'스마트팜 농가 모임'};
 const CLIENTS_EX = {BKK:'방콕 드럭스토어 바이어', TYO:'도쿄 편집숍', DXB:'두바이 수입상', LAX:'LA 한인마트', SGN:'호치민 유통사', TPE:'타이베이 백화점'};
 // 진짜 이야기 — 처음 겪을 때 한 번씩
@@ -213,6 +222,7 @@ const REAL = {
   canton:['🎪','캔톤페어 개막!','4월과 10월, 광저우에 세계 바이어가 모입니다. 공장들이 박람회 특가를 냅니다.','박람회는 <b>공장을 직접 고르는</b> 가장 빠른 길입니다. 사진만 보고 고르지 않습니다.'],
   export:['🌏','첫 수출!','한국 제품을 찾는 바이어는 세계에 있습니다. 소싱은 들여오는 것만이 아닙니다.','매장·브랜드가 있다면 <b>그 제품으로 수출</b>할 수도 있습니다.'],
   fx:['💱','환율이 움직입니다','원화가 약해지면 같은 공장가도 비싸집니다. 오른쪽 위 💱 숫자를 보세요.','결제 시점을 나눠 <b>환율 위험을 쪼갭니다</b>. 한 번에 다 내지 않습니다.'],
+  online:['🛒','첫 온라인 주문이 들어왔습니다','창고에 넣은 물건이 내 스마트스토어에서 팔리기 시작했습니다. 그런데 돈은 바로 들어오지 않습니다. 손님이 받고 구매확정을 해야 정산되고, 그때까지 일주일 넘게 걸립니다.','온라인 매출은 <b>수수료·광고비·택배비를 빼고</b>, <b>정산까지 버틸 현금</b>이 있어야 굴러갑니다. 리뷰 별점이 떨어지면 덜 팔립니다 — 그래서 검품을 합니다.'],
   brand:['🏷️','브랜드 가치가 생겼습니다','창고에서 온라인으로 팔린 이익이 쌓이면 그게 브랜드 가치가 됩니다. 수출·도매는 그날 번 돈으로 끝나지만, 꾸준히 팔리는 브랜드는 그 자체로 값이 붙습니다.','사는 쪽은 <b>매출이 아니라 꾸준한 이익</b>을 봅니다. 재고가 끊기지 않게 굴리는 것이 브랜드 가치를 키우는 가장 빠른 길입니다.'],
   exit:['🚀','브랜드는 팔 수 있는 자산입니다','물건을 사고파는 장사는 그날 번 돈이 전부입니다. 하지만 꾸준히 이익을 내는 온라인 브랜드는 그 자체를 팔 수 있습니다.','이커머스 브랜드는 보통 <b>연 이익의 2~4배</b>에 사고팝니다. 숫자로 증명되는 브랜드만 팔립니다. 그래서 처음부터 매출이 아니라 이익을 남기는 구조로 짭니다.'],
   ops:['🧑‍💼','운영 대행 계약','상세페이지·광고·CS를 맡기면 창고 재고가 더 빨리 팔립니다. 대신 매달 비용이 나갑니다.','배를 몰 시간에 스토어까지 보면 둘 다 놓칩니다. <b>사람을 뽑기 전에 맡겨 보는 것</b>도 방법입니다.']
@@ -259,7 +269,7 @@ const SAVE = 'potrin-voyage-v1', BEST = 'potrin-voyage-best';
 const store = { get(k){ try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;} }, set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }, del(k){ try{localStorage.removeItem(k);}catch(e){} } };
 function newGame(){
   G = {day:0, cash:20000000, port:'ICN', ship:0, cargo:{}, wh:{}, kc:{}, credit:0, ops:false, vat:0, contracts:[], krF:{}, exF:{}, fx:1,
-       stats:{voyages:0, sales:0, exports:0, best:{}}, brand:{hist:[], lastOffer:0, exited:false, offers:0}, mon:{start:20000000, sales:0}, seen:{}, sail:null, nextContract:0, buyQty:{}, qc:{}, surge:0};
+       stats:{voyages:0, sales:0, exports:0, best:{}}, store:{orders:[], rev:[], pending:[], reviews:0, rating:4.7, total:0}, brand:{hist:[], lastOffer:0, exited:false, offers:0}, mon:{start:20000000, sales:0}, seen:{}, sail:null, nextContract:0, buyQty:{}, qc:{}, surge:0};
   Object.keys(GOODS).forEach(g=>{ G.krF[g]=1; });
   Object.keys(PORTS).forEach(p=>{ G.exF[p]={}; Object.keys(GOODS).forEach(g=>G.exF[p][g]=1); });
   genContracts();
@@ -269,7 +279,6 @@ const month = d=>date(d).getMonth()+1;
 const fmt = n=>{ const s=n<0?'-':''; n=Math.abs(n); return s+(n>=1e8?(n/1e8).toFixed(2).replace(/\.?0+$/,'')+'억':n>=1e4?Math.round(n/1e4).toLocaleString()+'만':Math.round(n).toLocaleString())+'원'; };
 const won = n=>Math.round(n).toLocaleString()+'원';
 const rnd = (a,b)=>a+Math.random()*(b-a);
-const cap = ()=>SHIPS[G.ship].cap;
 const boxes = c=>Object.entries(c).reduce((a,[g,v])=>a+v.qty/GOODS[g].per,0);
 const usedBox = ()=>Math.ceil(boxes(G.cargo)-1e-9);
 const inSeason = g=>(GOODS[g].season||[]).includes(month(G.day));
@@ -284,8 +293,31 @@ function unitBuy(g,port){
 }
 function tier(g,b){ const m=moqOf(g); return b>=m*10?.9:b>=m*5?.95:1; }
 function moqOf(g){ return GOODS[g].buy.ICN? 1 : Math.max(1, Math.round(GOODS[g].moq*(1-.12*G.credit))); }
-function worth(){ const c=o=>Object.values(o).reduce((a,v)=>a+v.cost,0); return G.cash+G.vat+c(G.cargo)+c(G.wh)+shipValue(); }
-function shipValue(){ let v=0; for(let i=1;i<=G.ship;i++) v+=SHIPS[i].cost*.7; return v; } // 배는 되팔면 70%
+function worth(){ const c=o=>Object.values(o).reduce((a,v)=>a+v.cost,0); return G.cash+G.vat+c(G.cargo)+c(G.wh)+settlePending(); }
+// 내 스마트스토어 하루 — 주문 건수·리뷰·별점, 그리고 돈은 구매확정(약 8일) 뒤 정산으로 들어온다
+function storeDay(net, units, gross, items){
+  const st=G.store, orders=Math.round(units/1.4);
+  st.orders.push(orders); st.rev.push(Math.round(gross)); if(st.orders.length>14){ st.orders.shift(); st.rev.shift(); }
+  if(net>0) st.pending.push({due:G.day+8, amt:Math.round(net)});
+  st.total+=orders;
+  const newRev=Math.round(orders*rnd(.04,.1)); st.reviews+=newRev;
+  const target = (st.qcShare==null?.7:st.qcShare)>.6 ? 4.8 : 4.3; // 검품한 물건이 많을수록 별점이 좋다
+  st.rating=Math.round((st.rating+(target-st.rating)*.05+rnd(-.02,.02))*100)/100;
+  let paid=0; st.pending=st.pending.filter(x=>{ if(x.due<=G.day){ paid+=x.amt; return false; } return true; });
+  if(paid>0){ G.cash+=paid; G.mon.sales+=0; }
+  st.today={orders, gross:Math.round(gross), items, paid};
+  if(orders>0 && !G.seen.online){ G.seen.online=1; real('online'); }
+}
+function storeCard(){
+  const st=G.store, t=st.today||{orders:0,gross:0,paid:0}, o=st.orders, mx=Math.max(1,...o);
+  const bars=o.map(v=>`<i style="height:${Math.round(v/mx*100)}%"></i>`).join('');
+  const r7=st.rev.slice(-7).reduce((a,b)=>a+b,0);
+  return `<div class="store"><div class="st-h"><b>🏪 내 브랜드 스마트스토어</b><span>★ ${st.rating.toFixed(1)} · 리뷰 ${st.reviews.toLocaleString()}</span></div>
+    <div class="st-n"><div><small>오늘 주문</small><b>${t.orders}건</b></div><div><small>최근 7일 매출</small><b>${fmt(r7)}</b></div><div><small>정산 예정</small><b>${fmt(settlePending())}</b></div></div>
+    <div class="st-bars" title="최근 14일 주문">${bars||'<span>아직 주문이 없습니다</span>'}</div>
+    <div class="st-f">결제 → 배송 → 구매확정 → <b>약 8일 뒤 정산 입금</b> · 수수료 5.5% · 광고 14.5% · 택배 1,500원</div></div>`;
+}
+function settlePending(){ return (G.store&&G.store.pending||[]).reduce((a,x)=>a+x.amt,0); } // 구매확정 뒤 들어올 정산금
 
 /* ───────── 그리기 ───────── */
 const cv=document.getElementById('cv'), cx=cv.getContext('2d');
@@ -296,7 +328,10 @@ function resize(){
   S=Math.max(H/(LAT0-LAT1), 12, W/(LON1-LON0)); clampCam();
 }
 const sx=lon=>(lon-LON0)*S-camX, sy=lat=>(LAT0-lat)*S-camY;
-function clampCam(){ camX=Math.max(0,Math.min(camX,(LON1-LON0)*S-W)); camY=Math.max(0,Math.min(camY,(LAT0-LAT1)*S-H)); }
+function clampCam(){ // 오른쪽 판·아래 판에 가린 만큼 지도를 더 끌 수 있게 — LA 가 판 뒤에 숨지 않도록
+  const sh=document.getElementById('sheet'), open=sh&&!sh.hidden;
+  const padX = open && innerWidth>=900 ? sh.offsetWidth+32 : 0, padY = open && innerWidth<900 ? sh.offsetHeight : 0;
+  camX=Math.max(0,Math.min(camX,(LON1-LON0)*S-W+padX)); camY=Math.max(0,Math.min(camY,(LAT0-LAT1)*S-H+padY)); }
 function centerOn(lon,lat,smooth){
   const tx=(lon-LON0)*S-W*(innerWidth>=900?.38:.5), ty=(LAT0-lat)*S-H*(G&&G.sail?.5:.3);
   if(smooth){ camX+= (tx-camX)*.08; camY+=(ty-camY)*.08; } else { camX=tx; camY=ty; }
@@ -363,7 +398,7 @@ function loop(now){
     const s=G.sail; acc+=dt;
     while(acc>=DAY_MS && G.sail){ acc-=DAY_MS; s.day++; tick(); maybeEvent(); if(s.day>=s.days){ arrive(); break; } }
     if(G.sail){ s.prog=Math.min(s.len, (s.day+acc/DAY_MS)/s.days*s.len); centerOn(...along(s.pts,s.prog).slice(0,2), true);
-      document.getElementById('sailing').textContent=`⛵ ${PORTS[s.to].name}로 항해 중 · ${s.day}/${s.days}일`; }
+      const t=G.store.today; document.getElementById('sailing').innerHTML=`⛵ ${PORTS[s.to].name}로 항해 중 · ${s.day}/${s.days}일${t&&t.orders?`<br><small>🛒 오늘 스토어 주문 ${t.orders}건 · 매출 ${fmt(t.gross)}${t.paid?` · 💰 정산 입금 +${fmt(t.paid)}`:''}</small>`:''}`; }
     hud();
   }
   draw(now); requestAnimationFrame(loop);
@@ -375,18 +410,21 @@ function tick(){
   Object.keys(G.krF).forEach(g=>G.krF[g]+= (1-G.krF[g])*.025);
   Object.values(G.exF).forEach(m=>Object.keys(m).forEach(g=>m[g]+=(1-m[g])*.02));
   // 창고 온라인 판매
-  let sold=0, boxesHeld=0, bp=0;
+  let sold=0, boxesHeld=0, bp=0, units=0, gross=0; const dayItems={};
   Object.entries(G.wh).forEach(([g,v])=>{
     const d=GOODS[g]; boxesHeld+=v.qty/d.per;
-    const rate=d.size/70*seasonMul(g)*(G.ops?1.8:1)*rnd(.6,1.4)*Math.min(1,G.krF[g]+.25);
+    const star=Math.max(.5,(G.store.rating-3.5)/1.2); // 별점이 낮으면 덜 팔린다
+    const rate=d.size/70*seasonMul(g)*(G.ops?1.8:1)*rnd(.6,1.4)*Math.min(1,G.krF[g]+.25)*star;
     const n=Math.min(v.qty, Math.round(rate)); if(n<=0) return;
-    const price=d.kr*seasonMul(g)*G.krF[g], net=n*(price*.8-1500); // 수수료·광고 20%, 택배는 손님과 나눠 1,500원
-    const c=v.cost*n/v.qty; v.cost-=c; v.qty-=n; G.cash+=net; sold+=net; G.stats.sales+=net;
+    const price=d.kr*seasonMul(g)*G.krF[g], net=n*(price*.8-1500); // 수수료 5.5%·광고 14.5%, 택배는 손님과 나눠 1,500원
+    const c=v.cost*n/v.qty; v.cost-=c; v.qty-=n; sold+=net; G.stats.sales+=net; units+=n; gross+=n*price;
+    if(!dayItems[g]) dayItems[g]=0; dayItems[g]+=n;
     G.stats.best[g]=(G.stats.best[g]||0)+(net-c); bp+=net-c; G.mon.sales+=net;
     G.krF[g]=Math.max(.35, G.krF[g]-n/d.size*.55);
     if(v.qty<=0) delete G.wh[g];
   });
   const fee=Math.round(boxesHeld)*120; G.cash-=fee;
+  storeDay(sold, units, gross, dayItems);
   G.brand.hist.push(bp-fee); if(G.brand.hist.length>TRACK) G.brand.hist.shift();
   monthly(); checkDeal(); maybeOffer(); brandWatch(); if(G.day%10===0) save();
   if(fee>0 && !G.seen.storage && G.day>20){ G.seen.storage=1; real('storage'); }
@@ -399,7 +437,7 @@ function tick(){
 }
 // 브랜드 가치 = 최근 120일 온라인 순이익을 1년으로 늘리고 고정비(×0.6)를 뺀 값 × 3 (이커머스 브랜드는 보통 연 이익의 2~4배에 거래된다)
 const TRACK = 120; // 실적 기간 — 넉 달은 꾸준히 팔아야 사러 온다 (10/9 사장님 「살짝 어렵게」)
-function brandProfit(){ const h=G.brand.hist; if(!h.length) return 0; return h.reduce((a,b)=>a+b,0)/TRACK*365*.6; }
+function brandProfit(){ const h=G.brand.hist; if(!h.length) return 0; return h.reduce((a,b)=>a+b,0)/TRACK*365*.4; } // ×0.4 = 운임·사람·사무실·반품 같은 고정비를 뺀 진짜 이익
 function brandValue(){ return Math.max(0, Math.round(brandProfit()*3)); }
 // 브랜드 가치가 단계를 넘을 때마다 안내 — 항해를 멈추지 않는 띠로 띄운다 (2026-10-10 사장님 「브랜드 가치가 올라갈 때마다 안내 메시지」)
 const BV_STEPS=[5e6,1e7,2e7,3e7,5e7,7e7,1e8,1.5e8,2e8,3e8,5e8];
@@ -429,7 +467,7 @@ function maybeOffer(){
   const ap=brandProfit();
   if(b.hist.length<TRACK || G.day-b.lastOffer<45 || ap<25000000 || Math.random()>.03) return; // 넉 달 실적 + 연 이익 2,500만 이상
   b.lastOffer=G.day; b.offers++;
-  const mult=Math.round(rnd(1.8,3.2)*10)/10, price=Math.round(ap*mult/1e5)*1e5, buyer=BUYERS[Math.floor(Math.random()*BUYERS.length)];
+  const mult=Math.round(rnd(1.5,2.6)*10)/10, price=Math.round(ap*mult/1e5)*1e5, buyer=BUYERS[Math.floor(Math.random()*BUYERS.length)];
   ask('🤝','당신의 브랜드를 사고 싶다는 곳이 나타났습니다',
     `<b>${buyer}</b>에서 연락이 왔습니다.<br>최근 넉 달 온라인 이익에서 고정비를 빼고 1년으로 늘리면 <b>${fmt(ap)}</b>.<br>그 <b>${mult}배인 ${fmt(price)}</b>에 브랜드를 사겠다고 합니다. 창고 재고는 원가로 함께 넘깁니다.<br><br>단, <b>30일 동안 실사</b>를 합니다. 그동안 이익이 떨어지면 값을 깎거나 거래를 깹니다.<br>안 팔고 더 키우면, 다음 제안은 더 클 수도, 안 올 수도 있습니다.`,
     [['실사 받는다 — 팔 생각 있음', ()=>{ b.deal={price, mult, buyer, start:G.day, base:ap}; toast('🔍 30일 실사 시작 — 창고를 비우지 마세요'); if(window.gtag) gtag('event','brand_offer_accept',{game:'voyage', price}); render(); hud(); }],
@@ -476,7 +514,8 @@ function askSail(to){
   if(G.sail||to===G.port) { pending=null; $('sheet').classList.remove('min'); render(); return; }
   pending=to; $('sheet').classList.remove('min'); render();
 }
-function freightOf(b,len){ return b>0 ? Math.round(b*len*800+200000) : 0; } // 합적(LCL)은 실은 만큼만 낸다
+function perBox(len){ return Math.round(len*FREIGHT_PER_BOX_DEG/100)*100; }
+function freightOf(b,len){ return b>0 ? b*perBox(len)+DOC_FEE : 0; } // 실은 박스만큼 + 서류·통관 수수료
 function sail(){
   const to=pending, r=route(G.port,to), days=Math.max(1,Math.ceil(r.len/SPEED));
   const b=usedBox(), freight=freightOf(b,r.len);
@@ -502,6 +541,7 @@ function customs(){
     const qcQty=Math.min(v.qty, v.qc||0), raw=v.qty-qcQty;
     const bad=Math.round(raw*rnd(.02,.1)+qcQty*rnd(0,.01));
     if(bad>0){ v.cost-=v.cost*bad/v.qty; v.qty-=bad; lost+=bad; lines.push(`${d.e} ${d.n} 불량 ${bad}개`); }
+    G.store.qcShare = ((G.store.qcShare==null?.7:G.store.qcShare)*.5) + (v.qty? Math.min(1,(v.qc||0)/v.qty):0)*.5;
     const du=v.cost*d.duty, va=(v.cost+du)*.1; duty+=du; vat+=va;
     const w=G.wh[g]||{qty:0,cost:0}; w.qty+=v.qty; w.cost+=v.cost+du; G.wh[g]=w; delete G.cargo[g];
   });
@@ -545,7 +585,6 @@ function fulfil(i){
 function buy(g){
   const port=G.port, d=GOODS[g], b=G.buyQty[g]||moqOf(g), unit=unitBuy(g,port)*tier(g,b)*(G.qc[g]&&port!=='ICN'?1.03:1);
   const qty=b*d.per, total=Math.round(unit*qty);
-  if(usedBox()+b>cap()){ toast('📦 배가 꽉 찼습니다 — 조선소에서 배를 키우세요'); return; }
   if(G.cash<total){ toast('💸 돈이 모자랍니다'); return; }
   if(!G.seen.moq && port!=='ICN'){ G.seen.moq=1; real('moq'); }
   G.cash-=total; const v=G.cargo[g]||{qty:0,cost:0,qc:0}; v.qty+=qty; v.cost+=total; if(G.qc[g]) v.qc+=qty; G.cargo[g]=v;
@@ -571,7 +610,8 @@ const $=id=>document.getElementById(id), show=id=>$(id).hidden=false, hide=id=>$
 function hud(){
   $('hCash').textContent=fmt(G.cash); const d=date(G.day);
   $('hDate').textContent=`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} · D-${Math.max(0,GAME_DAYS-G.day)}`;
-  $('hCargo').textContent=`${usedBox()}/${cap()}박스`; $('hCredit').textContent='★'.repeat(G.credit)||'0';
+  $('hCargo').textContent=`실은 짐 ${usedBox()}박스`;
+  $('hOrders').textContent=`오늘 주문 ${(G.store&&G.store.today&&G.store.today.orders)||0}건`; $('hCredit').textContent='★'.repeat(G.credit)||'0';
   $('hFx').textContent=`환율 ${fxRate()}`;
   $('hBrand').textContent=G.brand.exited?'매각 완료':G.brand.deal?`실사 D-${Math.max(0,30-(G.day-G.brand.deal.start))}`:G.brand.hist.length<TRACK?`${fmt(brandValue())} (실적 ${G.brand.hist.length}/${TRACK}일)`:fmt(brandValue());
   if(G.goalAt==null && worth()>=GOAL && !G.ended) goal();
@@ -599,7 +639,7 @@ function render(){
     const sells=Object.entries(GOODS).filter(([g,d])=>d.export&&d.ex[pending]).map(([g,d])=>d.e+d.n).join(', ');
     const makes=Object.entries(GOODS).filter(([g,d])=>!d.export&&d.buy[pending]).map(([g,d])=>d.e+d.n).join(', ');
     h+=`<h2>${Q.home?'🏠':'⚓'} ${Q.name}로 출항할까요?</h2><p class="flavor">${Q.flavor}</p>
-      <div class="note">⏱ <b>${days}일</b> 걸립니다 · 운임 <b>${fr?fmt(fr):'없음'}</b> ${fr?`(실은 ${usedBox()}박스 + 항만료 20만)`:'(빈 배 — 실은 짐이 없으면 운임도 없습니다)'}
+      <div class="note">⏱ <b>${days}일</b> 걸립니다 · 포워더 운임 <b>${fr?fmt(fr):'없음'}</b> ${fr?`(박스당 ${won(perBox(r.len))} × ${usedBox()}박스 + 서류·통관 20만)`:'(실은 짐이 없으면 운임도 없습니다)'}
       ${makes?`<br>🏭 살 수 있는 것: ${makes}`:''}${sells?`<br>🛒 바이어가 찾는 것: ${sells}`:''}${pending==='ICN'?'<br>🛃 도착하면 통관하고 창고에 넣습니다':''}
       ${contractAt(pending)?'<br>🤝 이곳에 납품할 의뢰가 있습니다':''}</div>
       <div class="row"><button class="b big" id="go">⛵ 출항</button><button class="b alt big" id="cancel">여기 머물기</button></div>`;
@@ -613,7 +653,7 @@ function render(){
       <div class="row"><button class="b" data-f="${i}" ${ok?'':'disabled'}>${ok?'납품하기':`${hv.toLocaleString()}/${c.qty.toLocaleString()}개`}</button></div></div>`; }).join('')+`</div>`; }
   // 공장
   const fac=Object.entries(GOODS).filter(([g,d])=>d.buy[G.port]);
-  if(fac.length){ h+=`<div class="sec"><h3>${G.port==='ICN'?'🇰🇷 수출용 K-제품 매입':'🏭 공장'} <span>배 ${usedBox()}/${cap()}박스</span></h3>`+fac.map(([g,d])=>{
+  if(fac.length){ h+=`<div class="sec"><h3>${G.port==='ICN'?'🇰🇷 수출용 K-제품 매입':'🏭 공장'} <span>실은 짐 ${usedBox()}박스</span></h3>`+fac.map(([g,d])=>{
       const m=moqOf(g); if(!G.buyQty[g]||G.buyQty[g]<m) G.buyQty[g]=m; const b=G.buyQty[g];
       const u=unitBuy(g,G.port)*tier(g,b)*(G.qc[g]&&G.port!=='ICN'?1.03:1);
       const sub = d.export? `1박스 ${d.per}개 · 팔 곳 ${Object.keys(d.ex).map(p=>PORTS[p].name).join('·')}`
@@ -629,15 +669,13 @@ function render(){
         <div class="row"><button class="b alt" data-s5="${g}">5박스 팔기</button><button class="b" data-sa="${g}">전부 팔기</button></div></div>`; }).join('')+`</div>`; }
   if(G.port==='ICN'){
     const wh=Object.entries(G.wh);
-    h+=`<div class="sec"><h3>📦 창고 · 온라인 판매 중 <span>${G.ops?'운영 대행 ON':''}</span></h3>`+(wh.length?wh.map(([g,v])=>{ const d=GOODS[g], p=d.kr*seasonMul(g)*G.krF[g];
-      return `<div class="item"><div class="top"><span class="em">${d.e}</span><div><div class="nm">${d.n}</div><div class="sub">${v.qty.toLocaleString()}개 · 원가 개당 ${won(v.cost/v.qty)} · 수수료·광고 20% + 택배 1,500원</div><div class="bar"><i style="width:${Math.min(100,G.krF[g]*70)}%;background:${G.krF[g]<.6?'#E07A5F':'#3E8E6A'}"></i></div></div><div class="pr">${won(p)}<small>판매가</small></div></div>
+    h+=`<div class="sec"><h3>📦 창고 · 온라인 판매 중 <span>${G.ops?'운영 대행 ON':''}</span></h3>`+storeCard()+(wh.length?wh.map(([g,v])=>{ const d=GOODS[g], p=d.kr*seasonMul(g)*G.krF[g];
+      return `<div class="item"><div class="top"><span class="em">${d.e}</span><div><div class="nm">${d.n}</div><div class="sub">재고 ${v.qty.toLocaleString()}개 · 원가 개당 ${won(v.cost/v.qty)}${(G.store.today&&G.store.today.items[g])?` · 오늘 ${G.store.today.items[g]}개 팔림 (약 ${Math.max(1,Math.round(v.qty/G.store.today.items[g]))}일치)`:''}</div><div class="bar"><i style="width:${Math.min(100,G.krF[g]*70)}%;background:${G.krF[g]<.6?'#E07A5F':'#3E8E6A'}"></i></div></div><div class="pr">${won(p)}<small>판매가</small></div></div>
         <div class="row"><button class="b alt" data-dw="${g}">도매로 넘기기 (${won(d.kr*.42)}/개)</button></div></div>`; }).join('')
       :`<div class="note">비어 있습니다. 공장에서 사 온 물건이 통관을 마치면 여기서 <b>항해하는 동안에도</b> 팔립니다.</div>`)+`</div>`;
     const other=G.contracts.filter(c=>c.at!=='ICN');
     if(other.length) h+=`<div class="sec"><h3>📜 해외 의뢰</h3>`+other.map(c=>{ const d=GOODS[c.g]; return `<div class="item"><div class="top"><span class="em">${d.e}</span><div><div class="nm">${c.who}</div><div class="sub">${PORTS[c.at].name}로 ${d.n} ${c.qty.toLocaleString()}개 · 개당 ${won(c.price)} · D-${c.due-G.day}</div></div><div class="pr">${fmt(c.qty*c.price)}</div></div></div>`; }).join('')+`</div>`;
-    const nx=SHIPS[G.ship+1];
-    h+=`<div class="sec"><h3>🛠 조선소 · 계약</h3>
-      ${nx?`<div class="item"><div class="top"><span class="em">🚢</span><div><div class="nm">${nx.n}</div><div class="sub">${cap()} → ${nx.cap}박스</div></div><div class="pr">${fmt(nx.cost)}</div></div><div class="row"><button class="b" id="upShip">배 키우기</button></div></div>`:''}
+    h+=`<div class="sec"><h3>🛠 인증 · 계약</h3>
       ${Object.entries(GOODS).filter(([g,d])=>d.kc&&!G.kc[g]).map(([g,d])=>`<div class="item"><div class="top"><span class="em">🔖</span><div><div class="nm">KC 인증 — ${d.n}</div><div class="sub">인증 없이 들여오면 세관에서 멈춥니다</div></div><div class="pr">${fmt(d.kc)}</div></div><div class="row"><button class="b alt" data-kc="${g}">인증 받기</button></div></div>`).join('')}
       <div class="item"><div class="top"><span class="em">🧑‍💼</span><div><div class="nm">운영 대행 ${G.ops?'<span class="badge g">계약 중</span>':''}</div><div class="sub">상세·광고·CS를 맡겨 창고 판매 속도 ×1.8 · 매달 99만</div></div></div><div class="row"><button class="b alt" id="ops">${G.ops?'계약 끝내기':'맡기기'}</button></div></div>
       </div>
@@ -648,7 +686,7 @@ function render(){
   }
   h+=`<div class="note">🗺️ 지도에서 다른 항구를 누르면 출항합니다.</div>`;
   el.innerHTML=`<button class="handle" id="fold">${el.classList.contains('min')?'▴ 펼치기':'▾ 접고 지도 보기'}</button>`+h; show('sheet');
-  $('fold').onclick=()=>{ el.classList.toggle('min'); render(); };
+  $('fold').onclick=()=>{ el.classList.toggle('min'); render(); clampCam(); };
   el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ const g=b.dataset.m; G.buyQty[g]=Math.max(moqOf(g),G.buyQty[g]-1); render(); });
   el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{ const g=b.dataset.p; G.buyQty[g]++; render(); });
   el.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buy(b.dataset.buy));
@@ -658,7 +696,6 @@ function render(){
   el.querySelectorAll('[data-dw]').forEach(b=>b.onclick=()=>dump(b.dataset.dw,'wh'));
   el.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>fulfil(+b.dataset.f));
   el.querySelectorAll('[data-kc]').forEach(b=>b.onclick=()=>{ const g=b.dataset.kc; if(G.cash<GOODS[g].kc) return toast('💸 돈이 모자랍니다'); G.cash-=GOODS[g].kc; G.kc[g]=1; toast('🔖 KC 인증 완료'); render(); hud(); });
-  if($('upShip')) $('upShip').onclick=()=>{ const nx=SHIPS[G.ship+1]; if(G.cash<nx.cost) return toast('💸 돈이 모자랍니다'); G.cash-=nx.cost; G.ship++; toast(`🚢 ${nx.n}!`); render(); hud(); };
   if($('ops')) $('ops').onclick=()=>{ G.ops=!G.ops; if(G.ops&&!G.seen.ops){ G.seen.ops=1; real('ops'); } render(); };
   if($('w7')) $('w7').onclick=()=>wait(7);
   if($('retire')) $('retire').onclick=()=>ask('🏁','여기서 마칠까요?','지금까지 모은 자산으로 점수를 냅니다.',[['마치기',()=>{end();}],['계속하기',null,'alt']]);
@@ -727,7 +764,7 @@ function end(){
 function save(){ if(G && !G.ended) store.set(SAVE,G); } // 항해 중에도 저장 — 창을 닫아도 다음에 이어서 한다
 function start(fresh){
   if(fresh||!store.get(SAVE)) newGame(); else G=store.get(SAVE);
-  G.brand=G.brand||{hist:[], lastOffer:0, exited:false, offers:0}; G.mon=G.mon||{start:worth(), sales:0};
+  G.brand=G.brand||{hist:[], lastOffer:0, exited:false, offers:0}; G.store=G.store||{orders:[], rev:[], pending:[], reviews:0, rating:4.7, total:0}; G.mon=G.mon||{start:worth(), sales:0};
   hide('title'); show('hud'); resize(); centerOn(PORTS[G.port].lon, PORTS[G.port].lat); render(); hud();
   if(G.sail){ acc=0; show('sailing'); } else hide('sailing');
   if(fresh!==false && G.day===0) msg('⛵','1년, 2,000만 원으로 시작합니다','공장에서 사서 인천으로 들여와 <b>내 브랜드로 온라인에서 팔고</b>, K-제품을 실어 세계에 수출하세요. 온라인 이익이 쌓이면 브랜드를 사겠다는 곳이 나타납니다.<br><br>👉 먼저 지도에서 <b>이우·닝보</b>나 <b>광저우·선전</b>을 눌러 보세요. 빈 배는 운임이 없지만, 인천에서 K-제품을 실어 가면 가는 길에도 법니다.');
